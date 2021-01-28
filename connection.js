@@ -10,6 +10,7 @@ connection
     console.log("Database connected");
   })
   .catch((err) => {
+    console.log('problema na conexão')
     console.log(err);
   });
 
