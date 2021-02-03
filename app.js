@@ -4,7 +4,7 @@ const ObjectId = require("objectid");
 const cors = require("cors");
 const connection = require("./connection");
 const Aluno = require("./alunoSchema");
-const dummy = require("./alunoDummy");
+
 const app = express();
 app.use(bodyParser.json());
 app.use(cors());
@@ -15,21 +15,23 @@ app.listen(4000, () => {
 //Adicionar aluno
 app.post("/alunos", (req, res) => {
   const aluno = req.body;
-  console.log(aluno);
+  const id = aluno.id;
   var options = { mes: 2628000000, trimestre: 10512000000, anual: 31536000000 };
   var newExp;
-  switch (aluno.option) {
-    case "1":
-      newExp = options.mes;
-      break;
-    case "2":
-      newExp = options.trimestre;
-      break;
-    case "3":
-      newExp = options.anual;
-      break;
-    default:
-      newExp = options.mes;
+  if (!id) {
+    switch (aluno.option) {
+      case "1":
+        newExp = options.mes;
+        break;
+      case "2":
+        newExp = options.trimestre;
+        break;
+      case "3":
+        newExp = options.anual;
+        break;
+      default:
+        newExp = options.mes;
+    }
   }
 
   var newAluno = {
@@ -39,18 +41,31 @@ app.post("/alunos", (req, res) => {
     fat: aluno.fat,
     weight: aluno.weight,
     pressure: aluno.pressure,
-    exp: new Date().getTime() + newExp,
-    height: aluno.height,
-    dateregister: aluno.dateregister,
   };
-  console.log("chegando aqui");
-  Aluno.create(newAluno)
-    .then((value) => {
-      res.json(value.id);
-    })
-    .catch((err) => {
-      res.send("Houve um erro ao adicionar usuario " + err);
+  if (id) {
+    newAluno.id = id;
+  } else {
+    newAluno.exp = new Date().getTime() + newExp;
+    newAluno.dateregister = aluno.dateregister;
+  }
+
+  if (id) {
+    Aluno.updateOne({ _id: { $in: id }}, newAluno, (err, doc) => {
+      if (err) {
+        res.send(err);        
+      } else {
+             res.json(doc);
+      }
     });
+  } else {
+    Aluno.create(newAluno)
+      .then((value) => {
+        res.json(value.id);
+      })
+      .catch((err) => {
+        res.send("Houve um erro ao adicionar usuario " + err);
+      });
+  }
 });
 //Buscar todos os alunos
 app.get("/alunos", (req, res) => {
