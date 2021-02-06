@@ -50,11 +50,11 @@ app.post("/alunos", (req, res) => {
   }
 
   if (id) {
-    Aluno.updateOne({ _id: { $in: id }}, newAluno, (err, doc) => {
+    Aluno.updateOne({ _id: { $in: id } }, newAluno, (err, doc) => {
       if (err) {
-        res.send(err);        
+        res.send(err);
       } else {
-             res.json(doc);
+        res.json(doc);
       }
     });
   } else {
@@ -130,6 +130,7 @@ app.patch(`/aluno/:id/renovar`, (req, res) => {
         if (err) {
           res.send(err);
         }
+
         res.json(doc);
       }
     );
