@@ -75,12 +75,37 @@ app.get("/alunos", (req, res) => {
     } else {
       res.json(
         docs.map((e) => {
-          /* if (e.exp >= new Date().getTime()) {
-            return { pagas: e };
-          } else {
-            return { vencidas: e };
-          }*/
           return e;
+        })
+      );
+    }
+  });
+});
+//Buscar todos os alunos expirados
+app.get("/mensalidades/expiradas", (req, res) => {
+  Aluno.find((err, docs) => {
+    if (err) {
+      res.send(err);
+    } else {
+      res.json(
+        docs.map((e) => {
+          return e.exp < new Date().getTime() ? e : null;
+        })
+      );
+    }
+  });
+});
+//Buscar quantidade de alunos expirados
+app.get("/quantidade/expiradas", (req, res) => {
+  Aluno.find((err, docs) => {
+    if (err) {
+      res.send(err);
+    } else {
+      res.json(
+        docs.map((e) => {
+          if (e.exp < new Date().getTime()) {
+            return e;
+          } 
         })
       );
     }
