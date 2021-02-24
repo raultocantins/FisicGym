@@ -8,6 +8,7 @@ const Aluno = require("./alunoSchema");
 const app = express();
 app.use(bodyParser.json());
 app.use(cors());
+
 app.listen(4000, () => {
   console.log("Server on.");
 });
@@ -100,14 +101,8 @@ app.get("/quantidade/expiradas", (req, res) => {
   Aluno.find((err, docs) => {
     if (err) {
       res.send(err);
-    } else {
-      res.json(
-        docs.map((e) => {
-          if (e.exp < new Date().getTime()) {
-            return e;
-          } 
-        })
-      );
+    } else {     
+     res.json(docs.map(e=>e.exp < new Date().getTime()).filter(e=>e ==true).length);
     }
   });
 });
@@ -151,6 +146,29 @@ app.patch(`/aluno/:id/renovar`, (req, res) => {
     Aluno.updateOne(
       { _id: ObjectId(id) },
       { exp: (aluno.exp += newExp) },
+      (err, doc) => {
+        if (err) {
+          res.send(err);
+        }
+
+        res.json(doc);
+      }
+    );
+  });
+});
+
+
+
+//Deletar Aluno
+app.delete(`/aluno/:id/remove`, (req, res) => {
+  var id = req.params.id;
+
+  Aluno.findById(id, (err, aluno) => {
+    if (err) {
+      res.send(err);
+    }
+    Aluno.deleteOne(
+      { _id: ObjectId(id) },   
       (err, doc) => {
         if (err) {
           res.send(err);
