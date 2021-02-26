@@ -42,6 +42,7 @@ app.post("/alunos", (req, res) => {
     fat: aluno.fat,
     weight: aluno.weight,
     pressure: aluno.pressure,
+    height: aluno.height,
   };
   if (id) {
     newAluno.id = id;
@@ -101,8 +102,11 @@ app.get("/quantidade/expiradas", (req, res) => {
   Aluno.find((err, docs) => {
     if (err) {
       res.send(err);
-    } else {     
-     res.json(docs.map(e=>e.exp < new Date().getTime()).filter(e=>e ==true).length);
+    } else {
+      res.json(
+        docs.map((e) => e.exp < new Date().getTime()).filter((e) => e == true)
+          .length
+      );
     }
   });
 });
@@ -157,8 +161,6 @@ app.patch(`/aluno/:id/renovar`, (req, res) => {
   });
 });
 
-
-
 //Deletar Aluno
 app.delete(`/aluno/:id/remove`, (req, res) => {
   var id = req.params.id;
@@ -167,15 +169,18 @@ app.delete(`/aluno/:id/remove`, (req, res) => {
     if (err) {
       res.send(err);
     }
-    Aluno.deleteOne(
-      { _id: ObjectId(id) },   
-      (err, doc) => {
-        if (err) {
-          res.send(err);
-        }
-
-        res.json(doc);
+    Aluno.deleteOne({ _id: ObjectId(id) }, (err, doc) => {
+      if (err) {
+        res.send(err);
       }
-    );
+
+      res.json(doc);
+    });
   });
+});
+
+app.get("/quantity/alunos", (req, res) => {
+  var quantity = [12, 19, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+
+  res.send(quantity);
 });
