@@ -103,10 +103,13 @@ app.get("/quantidade/expiradas", (req, res) => {
     if (err) {
       res.send(err);
     } else {
-      res.json(
+     
+       res.json(
         docs.map((e) => e.exp < new Date().getTime()).filter((e) => e == true)
-          .length
-      );
+            
+          );
+
+     
     }
   });
 });
