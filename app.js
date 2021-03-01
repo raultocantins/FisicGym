@@ -1,16 +1,27 @@
 const express = require("express");
+require("dotenv").config();
 const bodyParser = require("body-parser");
 const ObjectId = require("objectid");
 const cors = require("cors");
 const connection = require("./connection");
 const Aluno = require("./alunoSchema");
+const sendCobranca = require("./cobrar");
+const client = require("twilio")(
+  process.env.TWILIO_ACCOUT_SID,
+  process.env.TWILIO_AUTH_TOKEN,
+  {
+    lazyLoading: true,
+  }
+);
 
 const app = express();
 app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors());
 
 app.listen(4000, () => {
   console.log("Server on.");
+  sendCobranca();
 });
 
 //Adicionar aluno
@@ -103,13 +114,9 @@ app.get("/quantidade/expiradas", (req, res) => {
     if (err) {
       res.send(err);
     } else {
-     
-       res.json(
+      res.json(
         docs.map((e) => e.exp < new Date().getTime()).filter((e) => e == true)
-            
-          );
-
-     
+      );
     }
   });
 });
@@ -186,4 +193,19 @@ app.get("/quantity/alunos", (req, res) => {
   var quantity = [12, 19, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 
   res.send(quantity);
+});
+
+app.post("/whatsapp", (req, res) => {
+  console.log(req.body);
+
+  client.messages
+    .create({
+      from: "whatsapp:+14155238886",
+      body: `Resposta do contato ${req.body.WaId} = ${req.body.Body}`,
+      to: `whatsapp:+556392086480`,
+    })
+    .then((message) => console.log(message))
+    .catch((err) => {
+      console.log(err);
+    });
 });

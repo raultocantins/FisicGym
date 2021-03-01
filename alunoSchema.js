@@ -11,6 +11,7 @@ const alunoSchema = mongoose.Schema({
   height: Number,
   dateregister: Date,
   historic: Object,
+  stepcobranca:{ type: Number, default: 0 }
 });
 
 module.exports = mongoose.model("Aluno", alunoSchema);
