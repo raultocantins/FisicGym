@@ -1,4 +1,5 @@
 require("dotenv").config();
+const ObjectId = require("objectid");
 const client = require("twilio")(
   process.env.TWILIO_ACCOUT_SID,
   process.env.TWILIO_AUTH_TOKEN,
@@ -24,52 +25,48 @@ function SendCobranca() {
       console.log(err);
     } else {
       //selecionando alunos expirados
-      var alunosExpirados = docs.map((e) => {
-        return e.exp < new Date().getTime() ? e : null;
-      });
+      var alunosExpirados = docs
+        .map((e) => {
+          return e.exp < new Date().getTime() ? e : undefined;
+        })
+        .filter((e) => {
+          return e;
+        });
 
-      // enviando mensagem para aluno
-      alunosExpirados.map((aluno) => {
-        if (aluno.stepcobranca === 0) {
-          client.messages
-            .create({
-              from: "whatsapp:+14155238886",
-              body: step1(aluno.name),
-              to: `whatsapp:+${aluno.number}`,
-            })
-            .then((message) => console.log(message.sid));
 
-          Aluno.updateOne(
-            { _id: ObjectId(aluno._id) },
-            { stepcobranca: 1 },
-            (err, doc) => {
-              if (err) {
+      if (alunosExpirados.length > 0) {
+        // enviando mensagem para aluno
+
+        alunosExpirados.map((aluno) => {
+          if (aluno.stepcobranca === 0) {
+            client.messages
+              .create({
+                from: "whatsapp:+14155238886",
+                body: step1(aluno.name),
+                to: `whatsapp:+55${aluno.number}`,
+              })
+              .then((message) => {
+                Aluno.updateOne(
+                  { _id: ObjectId(aluno._id) },
+                  { stepcobranca: 1 },
+                  (err, doc) => {
+                    if (err) {
+                      console.log(err);
+                    }
+                    console.log("Deu tudo certo stepcobrança 1" + doc);
+                  }
+                );
+              })
+              .catch((err) => {
                 console.log(err);
-              }
-              console.log("Deu tudo certo stepcobrança 1" + doc);
-            }
-          );
-        }
-      });
+              });
+          }
+        });
+      } else {
+        return;
+      }
     }
   });
 }
 
- function teste(){
-
-  client.messages
-            .create({
-              from: "whatsapp:+14155238886",
-              body: step1('alex raul'),
-              to: `whatsapp:+556391201458`,
-            })
-            .then((message) => console.log(message))
-            .catch((err)=>{
-              console.log(err)
-            })
-}
-
-
-
-
-module.exports=teste;
+module.exports = SendCobranca;

@@ -21,7 +21,9 @@ app.use(cors());
 
 app.listen(4000, () => {
   console.log("Server on.");
-  sendCobranca();
+  setInterval(() => {
+    sendCobranca();
+  }, 10010000);
 });
 
 //Adicionar aluno
@@ -86,11 +88,15 @@ app.get("/alunos", (req, res) => {
     if (err) {
       res.send(err);
     } else {
-      res.json(
-        docs.map((e) => {
-          return e;
-        })
-      );
+      if (docs.length <= 0) {
+        res.send("");
+      } else {
+        res.json(
+          docs.map((e) => {
+            return e;
+          })
+        );
+      }
     }
   });
 });
@@ -101,9 +107,13 @@ app.get("/mensalidades/expiradas", (req, res) => {
       res.send(err);
     } else {
       res.json(
-        docs.map((e) => {
-          return e.exp < new Date().getTime() ? e : null;
-        })
+        docs
+          .map((e) => {
+            return e.exp < new Date().getTime() ? e : undefined;
+          })
+          .filter((e) => {
+            return e;
+          })
       );
     }
   });
@@ -191,20 +201,17 @@ app.delete(`/aluno/:id/remove`, (req, res) => {
 
 app.get("/quantity/alunos", (req, res) => {
   var quantity = [12, 19, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-
   res.send(quantity);
 });
 
 app.post("/whatsapp", (req, res) => {
-  console.log(req.body);
-
   client.messages
     .create({
       from: "whatsapp:+14155238886",
       body: `Resposta do contato ${req.body.WaId} = ${req.body.Body}`,
       to: `whatsapp:+556392086480`,
     })
-    .then((message) => console.log(message))
+    .then((message) => console.log(message.sid))
     .catch((err) => {
       console.log(err);
     });
