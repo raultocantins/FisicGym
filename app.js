@@ -19,13 +19,15 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors());
 
-app.listen(4000, () => {
+app.listen(process.env.PORT||4000, () => {
   console.log("Server on.");
  /* setInterval(() => {
     sendCobranca();
   }, 10010000);*/
 });
-
+app.get('/',(req,res)=>{
+  res.send('servidor ok')
+})
 //Adicionar aluno
 app.post("/alunos", (req, res) => {
   const aluno = req.body;
