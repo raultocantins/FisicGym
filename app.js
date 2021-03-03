@@ -21,9 +21,9 @@ app.use(cors());
 
 app.listen(4000, () => {
   console.log("Server on.");
-  setInterval(() => {
+ /* setInterval(() => {
     sendCobranca();
-  }, 10010000);
+  }, 10010000);*/
 });
 
 //Adicionar aluno
